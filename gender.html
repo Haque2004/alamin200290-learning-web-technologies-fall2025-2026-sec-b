@@ -1,17 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8" />
     <title>Gender Form</title>
+    <style>
+        .error { color: red; margin-top: 6px; }
+    </style>
 </head>
 <body>
-    <form>
-        <fieldset>
-            <legend>Gender</legend>
-            <input type="radio" name="gender" value="male"> Male
-            <input type="radio" name="gender" value="female"> Female
-            <input type="radio" name="gender" value="other"> Other
-        </fieldset><br>
+    <form id="genderForm" novalidate>
+        <label><input type="radio" name="gender" value="Male"> Male</label>
+        <label><input type="radio" name="gender" value="Female"> Female</label>
+        <label><input type="radio" name="gender" value="Other"> Other</label>
+        <br><br>
         <input type="submit" value="Submit">
+        <div id="genderError" class="error" aria-live="polite"></div>
     </form>
+
+    <script>
+        function validateGender() {
+            const radios = document.getElementsByName("gender");
+            const msg = document.getElementById("genderError");
+            let selected = false;
+
+            for (let i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    selected = true;
+                    break;
+                }
+            }
+
+            if (!selected) {
+                msg.textContent = "Please select a gender!";
+                msg.style.color = "red";
+                return false;
+            } else {
+                msg.textContent = "";
+                return true;
+            }
+        }
+
+        document.getElementById("genderForm").addEventListener("submit", function (e) {
+            if (!validateGender()) {
+                e.preventDefault();
+                const radios = document.getElementsByName("gender");
+                if (radios.length) radios[0].focus();
+            }
+        });
+    </script>
 </body>
 </html>

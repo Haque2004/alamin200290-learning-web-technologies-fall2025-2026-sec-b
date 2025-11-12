@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Profile Picture Form</title>
+</head>
+<body>
+    <h3>7. Profile Picture</h3>
+    <form onsubmit="return validateProfile()">
+        <label>User ID:</label>
+        <input type="text" id="userId">
+        <br><br>
+        <label>Picture:</label>
+        <input type="file" id="picture" accept="image/*">
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
+    <script>
+        function validateProfile() {
+            const userId = document.getElementById("userId").value.trim();
+            const fileInput = document.getElementById("picture");
+
+            const num = Number(userId);
+            if (userId === "" || !Number.isInteger(num) || num <= 0) {
+                alert("User ID cannot be empty and must be a positive integer");
+                return false;
+            }
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Picture cannot be empty");
+                return false;
+            }
+
+            const file = fileInput.files[0];
+            let isImage = false;
+            if (file.type) {
+                isImage = file.type.indexOf("image/") === 0;
+            } else {
+                const name = file.name || "";
+                const dot = name.lastIndexOf(".");
+                const ext = dot !== -1 ? name.substring(dot + 1).toLowerCase() : "";
+                const allowed = ["jpg","jpeg","png","gif","webp","bmp"];
+                isImage = allowed.includes(ext);
+            }
+
+            if (!isImage) {
+                alert("Selected file must be an image (jpg, png, gif, webp, bmp)");
+                return false;
+            }
+
+            const maxSize = 2 * 1024 * 1024; 
+            if (file.size > maxSize) {
+                alert("Image must be 2MB or smaller");
+                return false;
+            }
+
+            alert("Profile validated successfully!");
+            return true;
+        }
+    </script>
+</body>
+</html>

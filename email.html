@@ -4,10 +4,58 @@
     <title>Email Form</title>
 </head>
 <body>
-    <form>
-        <label>Email</label><br>
-        <input type="email" name="email" placeholder="sample@example.com"><br><br>
+    <h3>2. Email</h3>
+    <form id="emailForm">
+        <input type="email" id="email" placeholder="sample@example.com">
+        <br><br>
         <input type="submit" value="Submit">
     </form>
+  <script>
+
+const input = document.getElementById("email");
+const form = document.getElementById("emailForm");
+
+form.addEventListener("submit", function (event) {
+  event.preventDefault(); 
+  const email = input.value.trim();
+  validateEmail(email);
+});
+
+function validateEmail(email) {
+
+  let message = document.getElementById("message");
+  if (!message) {
+    message = document.createElement("h3");
+    message.id = "message";
+    message.style.textAlign = "center";
+    document.body.appendChild(message);
+  }
+
+  if (email === "") {
+    message.style.color = "red";
+    message.textContent = "Email cannot be empty.";
+    return false;
+  }
+
+  const atIndex = email.indexOf("@");
+  if (atIndex <= 0) {
+    message.style.color = "red";
+    message.textContent = "Please enter a valid email address (example@example.com).";
+    return false;
+  }
+ 
+  const dotIndex = email.indexOf(".", atIndex + 2);
+  if (dotIndex === -1 || dotIndex === email.length - 1) {
+    message.style.color = "red";
+    message.textContent = "Please enter a valid email address (example@example.com).";
+    return false;
+  }
+
+  message.style.color = "green";
+  message.textContent = "Email is valid: " + email;
+  return true;
+}
+
+  </script>
 </body>
 </html>
