@@ -1,62 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Profile Picture Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Form with Data Input</title>
 </head>
 <body>
-    <h3>7. Profile Picture</h3>
-    <form onsubmit="return validateProfile()">
-        <label>User ID:</label>
-        <input type="text" id="userId">
-        <br><br>
-        <label>Picture:</label>
-        <input type="file" id="picture" accept="image/*">
-        <br><br>
-        <input type="submit" value="Submit">
-    </form>
+
+    <h2>Registration Form</h2>
+
+    <label for="dataTypeInput">Enter Data Type:</label>
+    <input type="text" id="dataTypeInput" placeholder="Enter name, email, dob, etc." />
+    <div id="inputField"></div> 
+    <button id="saveButton" style="display:none;">Save</button>
+
+    <div id="dataSection"></div>
+
     <script>
-        function validateProfile() {
-            const userId = document.getElementById("userId").value.trim();
-            const fileInput = document.getElementById("picture");
+        const dataTypeInput = document.getElementById("dataTypeInput");
+        const inputField = document.getElementById("inputField");
+        const saveButton = document.getElementById("saveButton");
+        const dataSection = document.getElementById("dataSection");
 
-            const num = Number(userId);
-            if (userId === "" || !Number.isInteger(num) || num <= 0) {
-                alert("User ID cannot be empty and must be a positive integer");
-                return false;
+        let formData = {};
+
+        dataTypeInput.addEventListener('input', function() {
+            const dataType = dataTypeInput.value.trim().toLowerCase();
+
+            inputField.innerHTML = '';
+            saveButton.style.display = 'none';
+
+            if (dataType) {
+                createInputField(dataType);
+            }
+        });
+
+        function createInputField(type) {
+            let fieldHTML = '';
+            switch(type) {
+                case 'name':
+                    fieldHTML = `<label for="name">Enter Name:</label>
+                                 <input type="text" id="name" value="${formData.name || ''}" required><br>`;
+                    break;
+                case 'email':
+                    fieldHTML = `<label for="email">Enter Email:</label>
+                                 <input type="email" id="email" value="${formData.email || ''}" required><br>`;
+                    break;
+                case 'dob':
+                    fieldHTML = `<label for="dob">Enter Date of Birth (dd/mm/yyyy):</label><br>
+                                 <input type="text" id="dd" value="${formData.dob ? formData.dob.split('/')[0] : ''}" placeholder="dd" required> /
+                                 <input type="text" id="mm" value="${formData.dob ? formData.dob.split('/')[1] : ''}" placeholder="mm" required> /
+                                 <input type="text" id="yyyy" value="${formData.dob ? formData.dob.split('/')[2] : ''}" placeholder="yyyy" required><br>`;
+                    break;
+                case 'degree':
+                    fieldHTML = `<label for="degree">Select Degree(s):</label><br>
+                                 <input type="checkbox" id="ssc" name="degree" value="SSC" ${formData.degree && formData.degree.includes("SSC") ? "checked" : ""}> SSC
+                                 <input type="checkbox" id="hsc" name="degree" value="HSC" ${formData.degree && formData.degree.includes("HSC") ? "checked" : ""}> HSC
+                                 <input type="checkbox" id="bsc" name="degree" value="BSc" ${formData.degree && formData.degree.includes("BSc") ? "checked" : ""}> BSc
+                                 <input type="checkbox" id="bsc" name="degree" value="MSc" ${formData.degree && formData.degree.includes("MSc") ? "checked" : ""}> MSc<br>`;
+                    break;
+                case 'bloodgroup':
+                    fieldHTML = `<label for="bloodgroup">Select Blood Group:</label>
+                                 <select id="bloodgroup" required>
+                                     <option value="">Select</option>
+                                     <option value="A+" ${formData.bloodgroup === "A+" ? "selected" : ""}>A+</option>
+                                     <option value="A-" ${formData.bloodgroup === "A-" ? "selected" : ""}>A-</option>
+                                     <option value="B+" ${formData.bloodgroup === "B+" ? "selected" : ""}>B+</option>
+                                     <option value="B-" ${formData.bloodgroup === "B-" ? "selected" : ""}>B-</option>
+                                     <option value="O+" ${formData.bloodgroup === "O+" ? "selected" : ""}>O+</option>
+                                     <option value="O-" ${formData.bloodgroup === "O-" ? "selected" : ""}>O-</option>
+                                     <option value="AB+" ${formData.bloodgroup === "AB+" ? "selected" : ""}>AB+</option>
+                                     <option value="AB-" ${formData.bloodgroup === "AB-" ? "selected" : ""}>AB-</option>
+                                 </select><br>`;
+                    break;
+                case 'gender':
+                    fieldHTML = `<label for="gender">Select Gender:</label><br>
+                                 <input type="radio" name="gender" value="Male" ${formData.gender === 'Male' ? 'checked' : ''}> Male
+                                 <input type="radio" name="gender" value="Female" ${formData.gender === 'Female' ? 'checked' : ''}> Female
+                                 <input type="radio" name="gender" value="Other" ${formData.gender === 'Other' ? 'checked' : ''}> Other<br>`;
+                    break;
+                default:
+                    fieldHTML = `<p>Please enter a valid data type: name, email, dob, degree, gender, etc.</p>`;
             }
 
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Picture cannot be empty");
-                return false;
+            inputField.innerHTML = fieldHTML;
+            saveButton.style.display = 'inline-block';
+
+            saveButton.onclick = function() {
+                if (validateData(type)) {
+                    saveData(type);
+                }
+            };
+        }
+
+        function validateData(type) {
+            let value;
+            switch(type) {
+                case 'name':
+                    value = document.getElementById('name').value.trim();
+                    if (value === "") {
+                        alert("Name cannot be empty");
+                        return false;
+                    }
+      
+                    for (let i = 0; i < value.length; i++) {
+                        if (value[i] >= '0' && value[i] <= '9') {
+                            alert("Name cannot contain numbers");
+                            return false;
+                        }
+                    }
+                    break;
+
+                case 'email':
+                    value = document.getElementById('email').value.trim();
+                    if (value === "") {
+                        alert("Email cannot be empty");
+                        return false;
+                    }
+
+                    if (value.indexOf('@') === -1 || value.indexOf('.') === -1) {
+                        alert("Please enter a valid email (example@domain.com)");
+                        return false;
+                    }
+                    break;
+
+                case 'dob':
+                    const dd = document.getElementById('dd').value.trim();
+                    const mm = document.getElementById('mm').value.trim();
+                    const yyyy = document.getElementById('yyyy').value.trim();
+                    if (isNaN(dd) || isNaN(mm) || isNaN(yyyy)) {
+                        alert("Date of Birth must be numbers");
+                        return false;
+                    }
+                    if (dd === "" || mm === "" || yyyy === "") {
+                        alert("Please enter a valid date of birth");
+                        return false;
+                    }
+                    break;
+
+                case 'degree':
+                    const degrees = [];
+                    if (document.getElementById('ssc').checked) degrees.push('SSC');
+                    if (document.getElementById('hsc').checked) degrees.push('HSC');
+                    if (document.getElementById('bsc').checked) degrees.push('BSc');
+                    if (document.getElementById('msc').checked) degrees.push('MSc');
+                    if (degrees.length === 0) {
+                        alert("Please select at least one degree");
+                        return false;
+                    }
+                    break;
+
+                default:
+                    break;
             }
 
-            const file = fileInput.files[0];
-            let isImage = false;
-            if (file.type) {
-                isImage = file.type.indexOf("image/") === 0;
-            } else {
-                const name = file.name || "";
-                const dot = name.lastIndexOf(".");
-                const ext = dot !== -1 ? name.substring(dot + 1).toLowerCase() : "";
-                const allowed = ["jpg","jpeg","png","gif","webp","bmp"];
-                isImage = allowed.includes(ext);
-            }
-
-            if (!isImage) {
-                alert("Selected file must be an image (jpg, png, gif, webp, bmp)");
-                return false;
-            }
-
-            const maxSize = 2 * 1024 * 1024; 
-            if (file.size > maxSize) {
-                alert("Image must be 2MB or smaller");
-                return false;
-            }
-
-            alert("Profile validated successfully!");
             return true;
         }
+
+        function saveData(type) {
+            let value;
+            switch(type) {
+                case 'name':
+                    value = document.getElementById('name').value.trim();
+                    if (value) formData.name = value;
+                    break;
+                case 'email':
+                    value = document.getElementById('email').value.trim();
+                    if (value) formData.email = value;
+                    break;
+                case 'dob':
+                    const dd = document.getElementById('dd').value.trim();
+                    const mm = document.getElementById('mm').value.trim();
+                    const yyyy = document.getElementById('yyyy').value.trim();
+                    if (dd && mm && yyyy) formData.dob = `${dd}/${mm}/${yyyy}`;
+                    break;
+                case 'degree':
+                    const degrees = [];
+                    if (document.getElementById('ssc').checked) degrees.push('SSC');
+                    if (document.getElementById('hsc').checked) degrees.push('HSC');
+                    if (document.getElementById('bsc').checked) degrees.push('BSc');
+                    if (document.getElementById('msc').checked) degrees.push('MSc');
+                    if (degrees.length) formData.degree = degrees.join(", ");
+                    break;
+                case 'bloodgroup':
+                    value = document.getElementById('bloodgroup').value;
+                    if (value) formData.bloodgroup = value;
+                    break;
+                case 'gender':
+                    value = document.querySelector('input[name="gender"]:checked')?.value;
+                    if (value) formData.gender = value;
+                    break;
+            }
+
+            updateDataSection();
+        }
+
+        function updateDataSection() {
+            dataSection.innerHTML = '<h3>Entered Data:</h3>';
+            for (const key in formData) {
+                if (formData.hasOwnProperty(key)) {
+                    dataSection.innerHTML += `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${formData[key]}</p>`;
+                }
+            }
+        }
     </script>
+
 </body>
 </html>
